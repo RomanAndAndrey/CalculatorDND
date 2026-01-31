@@ -344,17 +344,16 @@ input, select, textarea {
 
 .input {
   width: 100%;
-  padding: 1.2rem 1.25rem;
+  padding: 1.5rem 1.25rem 2.5rem 1.25rem; /* Экстремальный нижний отступ для хвостов букв */
   background: var(--surface);
   border: 2px solid var(--surface-light);
   border-radius: var(--radius-md);
   color: var(--text);
-  line-height: normal;
-  min-height: 4.5rem;
+  line-height: 1;
+  min-height: 5.5rem;
   transition: border-color var(--transition), box-shadow var(--transition);
   box-sizing: border-box;
-  display: flex;
-  align-items: center;
+  overflow: visible;
 }
 
 .input:focus {
@@ -369,11 +368,11 @@ input, select, textarea {
 
 .input--formula {
   font-family: var(--font-heading);
-  font-size: 1.5rem;
+  font-size: 1.4rem; /* Чуть уменьшим чтобы не вылезало на узких экранах */
   text-align: center;
-  padding: 1.5rem 1.5rem;
-  line-height: normal;
-  min-height: 5.5rem;
+  padding: 1.5rem 1.5rem 3rem 1.5rem; /* Огромный нижний отступ */
+  line-height: 1;
+  min-height: 6.5rem;
 }
 
 .input--error {
