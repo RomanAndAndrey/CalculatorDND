@@ -33,7 +33,11 @@ export function saveRoll(entry) {
   try {
     const history = getHistory();
     
-    // Добавляем в начало
+    // Ограничиваем количество результатов для экономии места в LocalStorage
+    if (entry.values && entry.values.length > 10000) {
+      entry.values = entry.values.slice(0, 10000);
+    }
+
     history.unshift({
       ...entry,
       id: Date.now(),
