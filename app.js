@@ -767,8 +767,8 @@ function showHistoryDetail(id) {
   const chartElements = {
     chart: document.getElementById('history-modal-chart'),
     container: document.getElementById('history-modal-chart-container'),
-    min: document.getElementById('history-modal-min'),
-    max: document.getElementById('history-modal-max'),
+    min: null,
+    max: null,
     mode: null,
     peak: null
   };
