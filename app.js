@@ -105,8 +105,10 @@ function init() {
   
   // Закрытие модалки по Escape
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && compareModal && !compareModal.classList.contains('hidden')) {
-      closeCompareModal();
+    if (e.key === 'Escape') {
+      if (compareModal && !compareModal.classList.contains('hidden')) closeCompareModal();
+      const historyModal = document.getElementById('history-modal');
+      if (historyModal && !historyModal.classList.contains('hidden')) historyModal.classList.add('hidden');
     }
   });
   
@@ -253,7 +255,8 @@ function performRoll() {
       result: times === 1 ? values[0] : total,
       advantage: getAdvantage(),
       times,
-      kd
+      kd,
+      values: lastRollValues
     });
     
     // Обновляем отображение истории
@@ -414,7 +417,17 @@ function renderHistogram(values, expr, times) {
 /**
  * Асинхронное построение гистограммы
  */
-function buildHistogramAsync(values, expr, times) {
+function buildHistogramAsync(values, expr, times, targetElements = null, skipHistory = false) {
+  // Контейнеры по умолчанию
+  const elements = targetElements || {
+    chart: histogramChart,
+    container: histogramContainer,
+    min: document.getElementById('histogram-min'),
+    max: document.getElementById('histogram-max'),
+    mode: document.getElementById('histogram-mode'),
+    peak: document.getElementById('histogram-peak-count')
+  };
+
   // Подсчёт частот
   const frequency = {};
   let maxCount = 0;
@@ -545,15 +558,17 @@ function buildHistogramAsync(values, expr, times) {
   }).join('');
   
   // Собираем SVG
+  // Генерируем уникальный ID для градиентов чтобы они не конфликтовали если открыто два графика
+  const gradId = 'grad-' + Math.random().toString(36).substr(2, 9);
   const svgHtml = `
     <svg class="histogram__svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="xMidYMid meet">
       <defs>
-        <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+        <linearGradient id="lineGradient-${gradId}" x1="0%" y1="0%" x2="100%" y2="0%">
           <stop offset="0%" stop-color="#7C3AED"/>
           <stop offset="50%" stop-color="#A78BFA"/>
           <stop offset="100%" stop-color="#F43F5E"/>
         </linearGradient>
-        <linearGradient id="areaGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+        <linearGradient id="areaGradient-${gradId}" x1="0%" y1="0%" x2="0%" y2="100%">
           <stop offset="0%" stop-color="#7C3AED" stop-opacity="0.4"/>
           <stop offset="100%" stop-color="#7C3AED" stop-opacity="0"/>
         </linearGradient>
@@ -566,10 +581,10 @@ function buildHistogramAsync(values, expr, times) {
       ${xLabels}
       
       <!-- Area fill -->
-      <path class="histogram__area" d="${areaPath}"/>
+      <path class="histogram__area" d="${areaPath}" style="fill: url(#areaGradient-${gradId})"/>
       
       <!-- Line -->
-      <path class="histogram__line" d="${linePath}"/>
+      <path class="histogram__line" d="${linePath}" style="stroke: url(#lineGradient-${gradId})"/>
       
       <!-- Dots -->
       ${dotsHtml}
@@ -577,17 +592,17 @@ function buildHistogramAsync(values, expr, times) {
   `;
   
   // Обновляем DOM
-  histogramChart.innerHTML = svgHtml;
-  histogramContainer.classList.remove('hidden');
+  elements.chart.innerHTML = svgHtml;
+  if (elements.container) elements.container.classList.remove('hidden');
   
   // Обновляем лейблы
-  document.getElementById('histogram-min').textContent = formatNumber(minVal);
-  document.getElementById('histogram-max').textContent = formatNumber(maxVal);
-  document.getElementById('histogram-mode').textContent = formatNumber(mode);
-  document.getElementById('histogram-peak-count').textContent = formatNumber(frequency[mode]);
+  if (elements.min) elements.min.textContent = formatNumber(minVal);
+  if (elements.max) elements.max.textContent = formatNumber(maxVal);
+  if (elements.mode) elements.mode.textContent = formatNumber(mode);
+  if (elements.peak) elements.peak.textContent = formatNumber(frequency[mode]);
   
   // Добавляем интерактивность для точек
-  histogramChart.querySelectorAll('.histogram__dot').forEach(dot => {
+  elements.chart.querySelectorAll('.histogram__dot').forEach(dot => {
     dot.addEventListener('mouseenter', (e) => {
       const value = e.target.dataset.value;
       const count = e.target.dataset.count;
@@ -626,8 +641,10 @@ function buildHistogramAsync(values, expr, times) {
     });
   });
   
-  // Сохраняем в историю графиков
-  addToChartHistory(expr, times, dataPoints, linePath);
+  // Сохраняем в историю графиков (только для обычного броска)
+  if (!skipHistory) {
+    addToChartHistory(expr, times, dataPoints, linePath);
+  }
 }
 
 /**
@@ -656,15 +673,20 @@ function renderHistory() {
       </div>
       <div class="flex items-center gap-075">
         <span class="history-item__result">${formatNumber(item.result)}</span>
-        <button class="history-item__btn" data-expr="${escapeHtml(item.expr)}" data-adv="${item.advantage}" data-times="${item.times}" data-kd="${item.kd || ''}">
-          Повторить
-        </button>
+        <div class="history-item__actions">
+          <button class="history-item__btn history-item__btn--icon btn-view-chart" data-id="${item.id}" title="Посмотреть график">
+            📊
+          </button>
+          <button class="history-item__btn btn-repeat" data-expr="${escapeHtml(item.expr)}" data-adv="${item.advantage}" data-times="${item.times}" data-kd="${item.kd || ''}">
+            Повторить
+          </button>
+        </div>
       </div>
     </div>
   `).join('');
   
   // Event listeners для кнопок повтора
-  historyList.querySelectorAll('button').forEach(btn => {
+  historyList.querySelectorAll('.btn-repeat').forEach(btn => {
     btn.addEventListener('click', () => {
       formulaInput.value = btn.dataset.expr;
       advantageInput.value = btn.dataset.adv;
@@ -675,6 +697,88 @@ function renderHistory() {
       performRoll();
     });
   });
+
+  // Event listeners для кнопок графика
+  historyList.querySelectorAll('.btn-view-chart').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = parseInt(btn.dataset.id);
+      showHistoryDetail(id);
+    });
+  });
+}
+
+/**
+ * Показать детали из истории в модальном окне
+ */
+function showHistoryDetail(id) {
+  const history = getHistory();
+  const entry = history.find(item => item.id === id);
+  
+  if (!entry || !entry.values) return;
+  
+  const modal = document.getElementById('history-modal');
+  const title = document.getElementById('history-modal-title');
+  const statsContainer = document.getElementById('history-modal-stats');
+  
+  // Заголовок
+  const date = new Date(entry.timestamp).toLocaleString('ru-RU');
+  title.innerHTML = `Детали: ${escapeHtml(entry.expr)} <small style="display:block; font-size: 0.8rem; color: var(--text-muted); font-family: sans-serif;">${date}</small>`;
+  
+  // Статистика
+  const stats = fullStats(entry.values, entry.kd);
+  statsContainer.innerHTML = `
+    <div class="stat-card">
+      <div class="stat-card__value">${formatNumber(stats.total)}</div>
+      <div class="stat-card__label">Сумма</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card__value">${formatNumber(parseFloat(stats.avg.toFixed(2)))}</div>
+      <div class="stat-card__label">Среднее</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card__value">${formatNumber(Math.round(stats.variance))}</div>
+      <div class="stat-card__label">Дисперсия</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card__value">${stats.stdDev.toFixed(2)}</div>
+      <div class="stat-card__label">Стд. откл.</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card__value">${formatNumber(stats.min)}</div>
+      <div class="stat-card__label">Минимум</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card__value">${formatNumber(stats.max)}</div>
+      <div class="stat-card__label">Максимум</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card__value">${formatNumber(stats.reliability * 100).split(',')[0]}%</div>
+      <div class="stat-card__label">Надёжность</div>
+    </div>
+    ${entry.kd ? `
+      <div class="stat-card">
+        <div class="stat-card__value">${(stats.successRate.percent || 0).toFixed(1)}%</div>
+        <div class="stat-card__label">Успех (КД ${entry.kd})</div>
+      </div>
+    ` : ''}
+  `;
+  
+  // График
+  const chartElements = {
+    chart: document.getElementById('history-modal-chart'),
+    container: document.getElementById('history-modal-chart-container'),
+    min: document.getElementById('history-modal-min'),
+    max: document.getElementById('history-modal-max'),
+    mode: null,
+    peak: null
+  };
+  
+  modal.classList.remove('hidden');
+  
+  // Отрисовка графика (с небольшой задержкой для плавности)
+  setTimeout(() => {
+    buildHistogramAsync(entry.values, entry.expr, entry.times, chartElements, true);
+  }, 50);
 }
 
 /**

@@ -248,6 +248,29 @@
             <div id="compare-legend" class="compare-modal__legend"></div>
           </div>
         </div>
+
+        <!-- Модальное окно деталей истории -->
+        <div id="history-modal" class="compare-modal hidden" onclick="if(event.target === this) this.classList.add('hidden')">
+          <div class="compare-modal__content compare-modal__content--wide">
+            <div class="compare-modal__header">
+              <h3 id="history-modal-title">Детали броска</h3>
+              <button type="button" class="compare-modal__close" onclick="document.getElementById('history-modal').classList.add('hidden')">&times;</button>
+            </div>
+            
+            <div id="history-modal-stats" class="stats-grid mb-1">
+              <!-- Сюда вставится статистика -->
+            </div>
+
+            <div id="history-modal-chart-container" class="histogram">
+              <h3 class="histogram__title">Распределение результатов</h3>
+              <div id="history-modal-chart" class="histogram__chart"></div>
+              <div class="histogram__labels">
+                <span id="history-modal-min"></span>
+                <span id="history-modal-max"></span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Сайдбар с историей -->

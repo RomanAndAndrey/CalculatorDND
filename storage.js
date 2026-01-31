@@ -26,6 +26,7 @@ export function getHistory() {
  * @param {number} entry.advantage - Фактор преимущества
  * @param {number} entry.times - Количество повторений
  * @param {number|null} entry.kd - КД (если указан)
+ * @param {Array} entry.values - Массив результатов бросков
  * @param {Date} entry.timestamp - Время броска
  */
 export function saveRoll(entry) {
