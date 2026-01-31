@@ -25,7 +25,6 @@ import {
 const formulaInput = document.getElementById('formula-input');
 const formulaError = document.getElementById('formula-error');
 const advantageInput = document.getElementById('advantage-input');
-const advantageValue = document.getElementById('advantage-value');
 const advantageDesc = document.getElementById('advantage-desc');
 const timesInput = document.getElementById('times-input');
 const kdInput = document.getElementById('kd-input');
@@ -195,27 +194,25 @@ function validateFormula() {
  * Изменение фактора преимущества
  */
 function handleAdvantageChange() {
-  const factor = parseInt(advantageInput.value, 10);
+  const factor = parseInt(advantageInput.value, 10) || 0;
   setAdvantage(factor);
   
-  // Обновляем отображение
-  const sign = factor > 0 ? '+' : '';
-  advantageValue.textContent = sign + factor;
+  // Обновляем описание
   advantageDesc.textContent = factorDesc(factor);
   
-  // Цвет значения
-  advantageValue.classList.remove(
-    'advantage-slider__value--positive',
-    'advantage-slider__value--negative',
-    'advantage-slider__value--neutral'
+  // Цвет поля ввода
+  advantageInput.classList.remove(
+    'advantage--positive',
+    'advantage--negative',
+    'advantage--neutral'
   );
   
   if (factor > 0) {
-    advantageValue.classList.add('advantage-slider__value--positive');
+    advantageInput.classList.add('advantage--positive');
   } else if (factor < 0) {
-    advantageValue.classList.add('advantage-slider__value--negative');
+    advantageInput.classList.add('advantage--negative');
   } else {
-    advantageValue.classList.add('advantage-slider__value--neutral');
+    advantageInput.classList.add('advantage--neutral');
   }
 }
 
@@ -235,7 +232,7 @@ function performRoll() {
   
   if (!validateFormula()) return;
   
-  const times = Math.min(10000, Math.max(1, parseInt(timesInput.value, 10) || 1));
+  const times = Math.min(100000, Math.max(1, parseInt(timesInput.value, 10) || 1));
   const kdValue = kdInput.value.trim();
   const kd = kdValue ? parseFloat(kdValue) : null;
   

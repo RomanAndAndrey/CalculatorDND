@@ -62,24 +62,16 @@
           <h2 id="settings-title" class="card__title">Настройки</h2>
           <div class="settings-row">
             
-            <!-- Преимущество/Помеха -->
-            <div class="advantage-slider">
-              <label for="advantage-input" class="input-group__label">Преимущество / Помеха</label>
+            <!-- Преимущество / Помеха -->
+            <div class="advantage-input-group">
+              <label for="advantage-input" class="input-group__label">Преимущество (+) / Помеха (-)</label>
               <input 
-                type="range" 
+                type="number" 
                 id="advantage-input" 
-                class="advantage-slider__input"
-                min="-3" 
-                max="3" 
+                class="input"
                 value="0"
-                step="1"
+                placeholder="0"
               >
-              <div class="advantage-slider__labels">
-                <span>-3</span>
-                <span>0</span>
-                <span>+3</span>
-              </div>
-              <div id="advantage-value" class="advantage-slider__value advantage-slider__value--neutral">0</div>
               <div id="advantage-desc" class="advantage-slider__desc">обычный бросок</div>
             </div>
             
@@ -92,7 +84,7 @@
                 class="input"
                 value="1"
                 min="1"
-                max="10000"
+                max="100000"
               >
             </div>
             

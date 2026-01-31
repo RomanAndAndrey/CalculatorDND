@@ -33,14 +33,15 @@ export function dieWithAdv(sides) {
     throw new Error('Число граней должно быть >= 1');
   }
   
-  const trials = 1 + Math.abs(ADV);
+  const factor = Math.max(-10, Math.min(10, ADV)); // Ограничиваем для безопасности
+  const trials = 1 + Math.abs(factor);
   const rolls = [];
   
   for (let i = 0; i < trials; i++) {
     rolls.push(Math.floor(Math.random() * sides) + 1);
   }
   
-  return ADV >= 0 ? Math.max(...rolls) : Math.min(...rolls);
+  return factor >= 0 ? Math.max(...rolls) : Math.min(...rolls);
 }
 
 /**
