@@ -344,12 +344,15 @@ input, select, textarea {
 
 .input {
   width: 100%;
-  padding: 0.875rem 1rem;
+  padding: 1rem 1.25rem;
   background: var(--surface);
   border: 2px solid var(--surface-light);
   border-radius: var(--radius-md);
   color: var(--text);
+  line-height: 1.4;
+  min-height: 3.5rem;
   transition: border-color var(--transition), box-shadow var(--transition);
+  box-sizing: border-box;
 }
 
 .input:focus {
@@ -366,7 +369,8 @@ input, select, textarea {
   font-family: var(--font-heading);
   font-size: 1.5rem;
   text-align: center;
-  padding: 1rem 1.5rem;
+  padding: 1.25rem 1.5rem;
+  line-height: 1.2;
 }
 
 .input--error {
