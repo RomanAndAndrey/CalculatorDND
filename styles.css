@@ -1216,3 +1216,15 @@ input, select, textarea {
   justify-content: center;
   font-size: 1.1rem;
 }
+
+.emoji-fix {
+  background: none !important;
+  -webkit-background-clip: initial !important;
+  background-clip: initial !important;
+  -webkit-text-fill-color: initial !important;
+  display: inline-block;
+  font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif !important;
+  vertical-align: middle;
+  line-height: 1;
+}
+

@@ -137,13 +137,13 @@ function applyTheme(theme) {
   
   if (theme === 'light') {
     document.documentElement.setAttribute('data-theme', 'light');
-    themeToggle.textContent = '🌞';
-    if (appTitle) appTitle.innerHTML = '🍎 Калькулятор Бобриный';
+    themeToggle.innerHTML = '<span class="emoji-fix">🌞</span>';
+    if (appTitle) appTitle.innerHTML = '<span class="emoji-fix">🍎</span> Калькулятор Бобриный';
     document.title = '🍎 Калькулятор Бобриный';
   } else {
     document.documentElement.removeAttribute('data-theme');
-    themeToggle.textContent = '🌛';
-    if (appTitle) appTitle.innerHTML = '💀 Калькулятор Бобинный';
+    themeToggle.innerHTML = '<span class="emoji-fix">🌛</span>';
+    if (appTitle) appTitle.innerHTML = '<span class="emoji-fix">💀</span> Калькулятор Бобинный';
     document.title = '💀 Калькулятор Бобинный';
   }
   
@@ -289,10 +289,10 @@ function showResult(total, times, expr) {
       
       if (isCritSuccess) {
         resultValue.classList.add('result-display__value--crit-success', 'glitch');
-        resultLabel.textContent = '🎯 КРИТИЧЕСКИЙ УСПЕХ!';
+        resultLabel.innerHTML = '<span class="emoji-fix">🎯</span> КРИТИЧЕСКИЙ УСПЕХ!';
       } else if (isCritFail) {
         resultValue.classList.add('result-display__value--crit-fail', 'glitch');
-        resultLabel.textContent = '💀 КРИТИЧЕСКИЙ ПРОВАЛ!';
+        resultLabel.innerHTML = '<span class="emoji-fix">💀</span> КРИТИЧЕСКИЙ ПРОВАЛ!';
       } else {
         resultLabel.textContent = times === 1 ? 'Результат' : `Сумма (${times} бросков)`;
       }
@@ -675,7 +675,7 @@ function renderHistory() {
         <span class="history-item__result">${formatNumber(item.result)}</span>
         <div class="history-item__actions">
           <button class="history-item__btn history-item__btn--icon btn-view-chart" data-id="${item.id}" title="Посмотреть график">
-            📊
+            <span class="emoji-fix">📊</span>
           </button>
           <button class="history-item__btn btn-repeat" data-expr="${escapeHtml(item.expr)}" data-adv="${item.advantage}" data-times="${item.times}" data-kd="${item.kd || ''}">
             Повторить
